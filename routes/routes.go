@@ -16,5 +16,13 @@ func Setup(app *fiber.App) {
 	app.Post("/user/logout", controllers.Logout)
 
 	// Product route
+	app.Get("/products", controllers.Product)
+	app.Get("/products/:id", controllers.GetProduct)
 
+	// Order route
+	app.Post("/addorder", controllers.AddOrder)
+	app.Get("/order", controllers.GetAllOrder)
+
+	// shop route (paid product database)
+	app.Post("/addshop", controllers.AddShop)
 }
