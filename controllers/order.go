@@ -36,6 +36,7 @@ func AddOrder(c *fiber.Ctx) error {
 	order := models.Order{
 		UserId:   id,
 		CreateAt: time.Now(),
+		Status:   "Initial",
 	}
 
 	database.DB.Create(&order)

@@ -41,6 +41,13 @@ func AddShop(c *fiber.Ctx) error {
 	// 	"ownby":"123"
 	// }
 	for i := 0; i < len(listProductId); i++ {
+		var productId models.Product
+
+		database.DB.Where("id = ?", listProductId[i]).First(&productId)
+		productId.QuantityInv -= int(listQuantity[i])
+
+		database.DB.Save(&productId)
+
 		shopData := models.Shop{
 			ProductId: listProductId[i],
 			Quantity:  listQuantity[i],

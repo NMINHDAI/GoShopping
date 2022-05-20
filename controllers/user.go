@@ -20,17 +20,39 @@ func Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+	validate := models.ValidateUser(data)
 
-	user := models.User{
-		Name:     data["name"],
-		Email:    data["email"],
-		Password: password,
+	if validate != "ok" {
+		c.Status(fiber.StatusExpectationFailed)
+		return c.JSON(fiber.Map{
+			"message": validate,
+		})
 	}
+	// check User is in database
+	var checkUser models.User
 
-	database.DB.Create(&user)
+	database.DB.Where("email = ?", data["email"]).First(&checkUser)
 
-	return c.JSON(user)
+	if checkUser.Id != 0 {
+		c.Status(fiber.StatusExpectationFailed)
+		return c.JSON(fiber.Map{
+			"message": "user has already been registered",
+		})
+	} else {
+
+		// if not usser, create in database
+		password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+
+		user := models.User{
+			Name:     data["name"],
+			Email:    data["email"],
+			Password: password,
+		}
+
+		database.DB.Create(&user)
+
+		return c.JSON(user)
+	}
 }
 
 func Login(c *fiber.Ctx) error {
@@ -47,14 +69,14 @@ func Login(c *fiber.Ctx) error {
 	if user.Id == 0 {
 		c.Status(fiber.StatusNotFound)
 		return c.JSON(fiber.Map{
-			"message": "user not found",
+			"message": "Invalid user or password",
 		})
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
-			"message": "incorrect password",
+			"message": "Invalid user or password",
 		})
 	}
 
