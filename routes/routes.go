@@ -2,13 +2,14 @@ package routes
 
 import (
 	"GoShopping/controllers"
+	"GoShopping/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func Setup(app *fiber.App) {
 	// User route
-	app.Post("/user/register", controllers.Register)
+	app.Post("/user/register", middleware.CheckCookie(), controllers.Register)
 	app.Post("/user/login", controllers.Login)
 	app.Get("/user/me", controllers.User)
 	// app.Put("/user/update", controllers.Update)
