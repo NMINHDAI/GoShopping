@@ -2,36 +2,22 @@ package controllers
 
 import (
 	"GoShopping/database"
+	"GoShopping/middleware"
 	"GoShopping/models"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
 // add new order to the database
 func AddOrder(c *fiber.Ctx) error {
-	// return current user
-	cookie := c.Cookies("jwt")
+	var id = middleware.CheckCookie(c)
 
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(SecretKey), nil
-	})
-
-	if err != nil {
-		c.Status(fiber.StatusUnauthorized)
+	if id == 0 {
 		return c.JSON(fiber.Map{
 			"message": "unauthenticated",
 		})
 	}
-
-	claims := token.Claims.(*jwt.StandardClaims)
-
-	var user models.User
-
-	database.DB.Where("id = ?", claims.Issuer).First(&user)
-
-	var id = user.Id
 
 	order := models.Order{
 		UserId:   id,

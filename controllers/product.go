@@ -38,3 +38,19 @@ func GetProduct(c *fiber.Ctx) error {
 	}
 	return c.JSON(product)
 }
+
+// bestseller get 5 highest quantity_Sold products in the database
+func GetBestSeller(c *fiber.Ctx) error {
+
+	var product []models.Product
+
+	result := database.DB.Limit(3).Order("quantity_inv desc").Find(&product)
+
+	if result.Error != nil {
+		c.Status(fiber.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"message": "Something went wrong",
+		})
+	}
+	return c.JSON(product)
+}

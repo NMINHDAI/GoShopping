@@ -19,5 +19,11 @@ func Connect() {
 		log.Fatalln(err)
 	}
 	DB = connection
-	connection.AutoMigrate(models.User{}, models.Product{}, models.Order{}, models.Shop{})
+	connection.AutoMigrate(
+		models.User{},
+		models.Product{},
+		models.Order{},
+		models.Shop{},
+		models.Transaction{},
+	)
 }

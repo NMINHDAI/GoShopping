@@ -10,7 +10,7 @@ import (
 
 const SecretKey = "secret"
 
-func CheckCookie(c *fiber.Ctx) string {
+func CheckCookie(c *fiber.Ctx) uint {
 	// return current user
 	cookie := c.Cookies("jwt")
 
@@ -19,7 +19,7 @@ func CheckCookie(c *fiber.Ctx) string {
 	})
 
 	if err != nil {
-		return "Invalid cookie" // Unauthorized
+		return 0 // Unauthorized
 	}
 
 	claims := token.Claims.(*jwt.StandardClaims)
@@ -28,9 +28,5 @@ func CheckCookie(c *fiber.Ctx) string {
 
 	database.DB.Where("id = ?", claims.Issuer).First(&user)
 
-	if user.Id == 0 {
-		return "Invalid Cookie"
-	}
-
-	return "Valid cookie"
+	return user.Id
 }
